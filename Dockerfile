@@ -8,7 +8,9 @@ RUN mkdir -p out && javac -d out src/app/Main.java test/app/MainTest.java \
  && rm out/app/MainTest.class
 
 FROM eclipse-temurin:21-jre-alpine
-RUN addgroup -S app -g 10001 && adduser -S app -u 10001 -G app
+# pick up Alpine security fixes released after the base image was built (keeps the Trivy gate green)
+RUN apk upgrade --no-cache \
+ && addgroup -S app -g 10001 && adduser -S app -u 10001 -G app
 WORKDIR /app
 COPY --from=build /src/out ./classes
 USER 10001
